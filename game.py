@@ -27,6 +27,7 @@ def take_turn(curr_board, player, move):
         # Next player has to go in a set subboard
         return (True, next_mov)
     # Move was not legal
+    # need to only return this if subboard is full or already won
     return (False, None)
 
 
@@ -65,8 +66,8 @@ in the backend*
 def sample_game():
     t_board = create_board()
     turn = 1
-    subboard = 4
-    choosing_board = False
+    subboard = -1
+    choosing_board = True
     while t_board.won == 0:
 
         # Interface stuff starts here
@@ -81,9 +82,14 @@ def sample_game():
             "Enter a number from 0-8 to select the square (where 0 is the top left, 1 is the top middle, and 8 is the bottom right): "
         )
         # Handle anything other than a number by setting it to an invalid number
-        if not subboard.isdecimal():
+        try:
+            subboard = int(subboard)
+        except ValueError:
             subboard = -1
-        if not move.isdecimal():
+
+        try:
+            move = int(move)
+        except ValueError:
             move = -1
         # Interface stuff ends here
 
