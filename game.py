@@ -18,6 +18,7 @@ Makes a given move, tuple of the form (board, space), on board curr_board as pla
 def take_turn(curr_board, player, move):
     if curr_board.is_legal(move):
         next_mov = curr_board.make_move(player, move)
+        print("board_status",curr_board.board_status)
         if curr_board.check_won():
             # Game ends
             return (True, None)
@@ -63,13 +64,13 @@ def sample_game():
     t_board = create_board()
     turn = 1
     subboard = -1
-    choosing_board = True
+    choosing_board = False
     while t_board.won == 0:
-
         # Interface stuff starts here
         # (in other words, for a nicer look we would change this)
         visualize_board(t_board)
-        if subboard == -1:
+        # now makes you choose a new board if the other board is won or a draw
+        if subboard == -1 or t_board.boards[subboard].won != 0:
             choosing_board = True
             subboard = input(
                 "Enter a number from 0-8 to select the board (where 0 is the top left, 1 is the top middle, and 8 is the bottom right): "
