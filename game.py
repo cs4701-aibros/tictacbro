@@ -18,16 +18,12 @@ Makes a given move, tuple of the form (board, space), on board curr_board as pla
 def take_turn(curr_board, player, move):
     if curr_board.is_legal(move):
         next_mov = curr_board.make_move(player, move)
-        if next_mov == -1:
-            if curr_board.check_won():
-                # Game ends
-                return (True, None)
-            # Next player can go anywhere
-            return (True, -1)
+        if curr_board.check_won():
+            # Game ends
+            return (True, None)
         # Next player has to go in a set subboard
         return (True, next_mov)
     # Move was not legal
-    # need to only return this if subboard is full or already won
     return (False, None)
 
 

@@ -28,7 +28,8 @@ class Board(object):
                 6 | 7 | 8
     won : int
         an integer representing which player has won the board
-        (0 meaning neither)
+        (0 meaning still in progress, -1 meaning all squares are full with no 
+        winner (ie. a draw))
 
     Methods
     -------
@@ -37,7 +38,8 @@ class Board(object):
         is illegal will raise InvalidMove, but this can (and should) be avoided
         by checking if moves are legal to begin with.
         Returns the spot taken (which will be the next big board used in
-        ultimate tic-tac-toe), or -1 if the move has won the board.
+        ultimate tic-tac-toe), a bool which indicates whether the player 
+        has won the board, and a bool which indicates if the board is draw
     is_legal(move)
         Checks if the spot referenced by int move is available to be taken by a
         player.
@@ -56,9 +58,11 @@ class Board(object):
         else:
             self.board_status[move] = player
             if self.check_won():
-                return -1
+                return (move, True, False)
+            elif self.check_draw():
+                return (move, False, True)
             else:
-                return move
+                return (move, False, False)
 
     def is_legal(self, move):
         return self.board_status[move] == 0
@@ -108,6 +112,15 @@ class Board(object):
             self.won = diags
             return True
         return False
+    
+    # Returns true iff the board is completely full and no player has won
+    def check_draw(self):
+        if not self.check_won():
+            for i in range(9):
+                if i == 0:
+                    return False
+            return True
+        return False
 
 
 class BigBoard(Board):
@@ -123,7 +136,8 @@ class BigBoard(Board):
         Ex. if board_status[0] = 1, then player 1 has won board 0
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
-        game (0 meaning neither)
+        game (0 meaning still in progress, -1 meaning all squares are full with 
+        no winner (ie. a draw))
 
     Methods
     -------
@@ -132,7 +146,7 @@ class BigBoard(Board):
         is illegal will raise InvalidMove, but this can (and should) be avoided
         by checking if moves are legal to begin with.
         Returns the spot taken (which will be the next big board used in
-        ultimate tic-tac-toe), or -1 if the move has won the board.
+        ultimate tic-tac-toe)
     is_legal(move)
         Checks if the spot referenced by int move is available to be taken by a
         player.
@@ -148,10 +162,12 @@ class BigBoard(Board):
     def make_move(self, player, move):
         big, small = move
         if self.boards[big].won == 0:
-            result = self.boards[big].make_move(player, small)
-            if result == -1:
+            (move, did_win, is_draw) = self.boards[big].make_move(player, small)
+            if did_win:
                 self.board_status[big] = player
-            return result
+            elif is_draw:
+                self.board_status[big] = -1
+            return move
         else:
             raise InvalidMove(move)
 
@@ -173,3 +189,6 @@ class BigBoard(Board):
 
     def check_won(self):
         return super(BigBoard, self).check_won()
+
+    def check_draw(self):
+        return super(BigBoard, self).check_draw()
