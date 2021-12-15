@@ -3,8 +3,9 @@ import numpy as np
 from collections import defaultdict
 from board import BigBoard
 from board import Board
+from game import *
 
-class MonteCarloTreeSearchNode():
+class MCTSNode():
   """
   Code for this algorithm greatly inspired by the tutorial given on:
   https://ai-boson.github.io/mcts/ 
@@ -40,7 +41,7 @@ class MonteCarloTreeSearchNode():
 
     action = self._untried_actions.pop()
     next_state = self.state.move(action)
-    child_node = MonteCarloTreeSearchNode(
+    child_node = MCTSNode(
     next_state, parent=self, parent_action=action)
 
     self.children.append(child_node)
@@ -70,7 +71,7 @@ class MonteCarloTreeSearchNode():
     return len(self._untried_actions) == 0
 
 
-  def best_child(self, c_param=0.1):
+  def best_child(self, c_param=0.5):
     
     choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children]
     return self.children[np.argmax(choices_weights)]
@@ -98,7 +99,7 @@ class MonteCarloTreeSearchNode():
       reward = v.rollout()
       v.backpropagate(reward)
 
-    return self.best_child(c_param=0.)
+    return self.best_child(c_param=0.5)
 
   # def get_legal_actions(self): 
   #   """
@@ -154,16 +155,18 @@ class MonteCarloTreeSearchNode():
   #   curr_board.make_move(self.player_number, action)
   #   return self.state.curr_board
 
-def create_board():
-    subboards = [Board() for i in range(9)]
-    curr_board = BigBoard(subboards)
-    return curr_board
 
 def main():
   initial_state = create_board()
-  root = MonteCarloTreeSearchNode(state = initial_state)
+  root = MCTSNode(state = initial_state)
   result = root.best_action()
-  print(result)
+  # visualize_board(result.state)
+  # print("board_status: ", result.state.board_status)
+  # print("won: ", result.state.won)
+  # print("current: ", result.player_number)
+  # print("parent_action: ", result.parent_action)
+  # print("untried_actions: ", result._untried_actions)
+  return result
 
 if __name__ == "__main__":
   main()

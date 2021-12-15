@@ -135,9 +135,10 @@ class BigBoard(Board):
     board_status : int list
         a list of ints representing the won status of the subboards
         Ex. if board_status[0] = 1, then player 1 has won board 0
-    prev_move : int tuple of the form (big, small) with big representing the
-        subboard and small representing the spot on the subboard
-        (-1, -1) if there is no previous move (initial state)
+    prev_move : 3-int tuple of the form (big, small, player_number) with 
+        big representing the subboard and small representing the spot on the 
+        subboard (-1, -1, 1) if there is no previous move (initial state and 
+        player 1 goes first)
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
         game (0 meaning still in progress, -1 meaning all squares are full with 
@@ -162,7 +163,7 @@ class BigBoard(Board):
     def __init__(self, subboards):
         super(BigBoard, self).__init__()
         self.boards = subboards
-        self.prev_move = (-1, -1)
+        self.prev_move = (-1, -1, 1)
 
     def make_move(self, player, move):
         big, small = move
@@ -172,7 +173,7 @@ class BigBoard(Board):
                 self.board_status[big] = player
             elif is_draw:
                 self.board_status[big] = -1
-            self.prev_move = (big, small)
+            self.prev_move = (big, small, player)
             return move
         else:
             raise InvalidMove(move)
@@ -208,7 +209,7 @@ class BigBoard(Board):
         possible actions from current state.
         Returns a list of moves in the form (big, small).
         """
-        small, big = self.prev_move
+        _, big, _ = self.prev_move
         if big != -1 and self.boards[big].won == 0:
             result = []
             for i in range(9):
@@ -239,10 +240,10 @@ class BigBoard(Board):
         if self.check_draw():
             return 0
         elif self.check_won():
-            if self.won == 2:
-                return 1
-            else:
+            if self.won == self.prev_move[2]:
                 return -1
+            else:
+                return 1
         return 0
 
     def move(self,action):
