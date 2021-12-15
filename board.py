@@ -198,3 +198,57 @@ class BigBoard(Board):
 
     def check_draw(self):
         return super(BigBoard, self).check_draw()
+
+
+# these are functions needed for MCTS
+
+    def get_legal_actions(self): 
+        """
+        Constructs a list of all
+        possible actions from current state.
+        Returns a list of moves in the form (big, small).
+        """
+        small, big = self.prev_move
+        if big != -1 and self.boards[big].won == 0:
+            result = []
+            for i in range(9):
+                if self.boards[big].board_status[i] == 0:
+                    result.append((big, i))
+            return result
+        else: 
+            result = []
+            for i in range(9):
+                if self.boards[i].won == 0:
+                    for j in range(9):
+                        if self.boards[i].board_status[j] == 0:
+                            result.append((i, j))
+            return result
+
+    def is_game_over(self):
+        """
+        Returns true if the game is over, false otherwise.
+        """
+        return self.check_won() or self.check_draw()
+
+    def game_result(self):
+        """
+        Returns 1 or 0 or -1 depending
+        on your state corresponding to win,
+        tie or a loss.
+        """
+        if self.check_draw():
+            return 0
+        elif self.check_won():
+            if self.won == 2:
+                return 1
+            else:
+                return -1
+        return 0
+
+    def move(self,action):
+        """
+        Returns the new state after making a move.
+        """
+        self.make_move(2, action)
+        return self
+  
