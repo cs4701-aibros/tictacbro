@@ -119,6 +119,7 @@ class Board(object):
             for i in range(9):
                 if i == 0:
                     return False
+            self.won = -1
             return True
         return False
 
@@ -134,6 +135,9 @@ class BigBoard(Board):
     board_status : int list
         a list of ints representing the won status of the subboards
         Ex. if board_status[0] = 1, then player 1 has won board 0
+    prev_move : int tuple of the form (big, small) with big representing the
+        subboard and small representing the spot on the subboard
+        (-1, -1) if there is no previous move (initial state)
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
         game (0 meaning still in progress, -1 meaning all squares are full with 
@@ -158,6 +162,7 @@ class BigBoard(Board):
     def __init__(self, subboards):
         super(BigBoard, self).__init__()
         self.boards = subboards
+        self.prev_move = (-1, -1)
 
     def make_move(self, player, move):
         big, small = move
@@ -167,6 +172,7 @@ class BigBoard(Board):
                 self.board_status[big] = player
             elif is_draw:
                 self.board_status[big] = -1
+            self.prev_move = (big, small)
             return move
         else:
             raise InvalidMove(move)
