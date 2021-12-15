@@ -5,16 +5,12 @@ from monte_carlo import MCTSNode
 import random
 import copy
 
-
-
 """
 Just so I can put a random player vs. Monte Carlo Player and compare
 win percentages.
 """
 
-game_board = create_board()
-
-def make_random_move(player_number):
+def make_random_move(player_number, game_board):
     actions_list = game_board.get_legal_actions()
     index = random.randint(0, len(actions_list) - 1)
     action = actions_list[index]
@@ -22,17 +18,16 @@ def make_random_move(player_number):
 
 num_games = 1000
 
-
-
 def simulate():
     mc_win_count = 0
     random_win_count = 0
     error_count = 0
     draw_count = 0
     for i in range(num_games):
+        game_board = create_board()
         try:
             while not game_board.is_game_over():
-                make_random_move(1)
+                make_random_move(1,game_board)
                 #MCTS move 2
                 game_board2 = copy.deepcopy(game_board)
                 root = MCTSNode(state = game_board2)
