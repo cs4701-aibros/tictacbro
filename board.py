@@ -117,7 +117,7 @@ class Board(object):
     def check_draw(self):
         if not self.check_won():
             for i in range(9):
-                if i == 0:
+                if self.board_status[i] == 0:
                     return False
             self.won = -1
             return True
