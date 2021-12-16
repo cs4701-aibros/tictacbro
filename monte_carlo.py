@@ -11,9 +11,8 @@ class MCTSNode():
   https://ai-boson.github.io/mcts/ 
   (Link also listed as a reference in our written report.)
   """
-  def __init__(self, state, player_number=2, parent=None, parent_action=None):
+  def __init__(self, state, parent=None, parent_action=None):
     self.state = state
-    self.player_number = player_number
     self.parent = parent
     self.parent_action = parent_action
     self.children = []
@@ -108,7 +107,6 @@ def main():
   # visualize_board(result.state)
   # print("board_status: ", result.state.board_status)
   # print("won: ", result.state.won)
-  # print("current: ", result.player_number)
   # print("parent_action: ", result.parent_action)
   # print("untried_actions: ", result._untried_actions)
   return result

@@ -137,7 +137,7 @@ class BigBoard(Board):
         Ex. if board_status[0] = 1, then player 1 has won board 0
     prev_move : 3-int tuple of the form (big, small, player_number) with 
         big representing the subboard and small representing the spot on the 
-        subboard (-1, -1, 1) if there is no previous move (initial state and 
+        subboard (-1, -1, 2) if there is no previous move (initial state and 
         player 1 goes first)
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
@@ -163,7 +163,7 @@ class BigBoard(Board):
     def __init__(self, subboards):
         super(BigBoard, self).__init__()
         self.boards = subboards
-        self.prev_move = (-1, -1, 1)
+        self.prev_move = (-1, -1, 2)
 
     def make_move(self, player, move):
         big, small = move
