@@ -1,115 +1,79 @@
-from game import create_board
 import numpy as np
-from collections import defaultdict
-from board import BigBoard
-from board import Board
-from game import *
 
 class MCTSNode():
   """
-  Code for this algorithm greatly inspired by the tutorial given on:
+  Code for this algorithm inspired by the tutorial given on:
   https://ai-boson.github.io/mcts/ 
   (Link also listed as a reference in our written report.)
   """
-  def __init__(self, state, parent=None, parent_action=None):
+  def __init__(self, state, player_number, parent=None, parent_action=None):
     self.state = state
+    self.want_to_win = 1
+    self.player_number = player_number
     self.parent = parent
     self.parent_action = parent_action
     self.children = []
-    self._number_of_visits = 0
-    self._results = defaultdict(int)
-    self._results[1] = 0
-    self._results[-1] = 0
-    self._untried_actions = self.untried_actions()
-    return
-
-  def untried_actions(self):
-    self._untried_actions = self.state.get_legal_actions()
-    return self._untried_actions
-
-  def q(self):
-    wins = self._results[1]
-    loses = self._results[-1]
-    return wins - loses
-
-  def n(self):
-    return self._number_of_visits
+    self.actions = self.state.get_legal_actions()
+    self.wins = 0
+    self.losses = 0
+    self.num_sims = 0
 
   def expand(self):
-
-    action = self._untried_actions.pop()
-    next_state = self.state.move(action)
-    child_node = MCTSNode(
-    next_state, parent=self, parent_action=action)
-
-    self.children.append(child_node)
-    return child_node     
-
-  def is_terminal_node(self):
-    return self.state.is_game_over()
+    action = self.actions.pop()
+    next_state = self.state.move_MTCS(self.player_number, action)
+    player = 0
+    if self.player_number == 1:
+        player = 2
+    else:
+        player = 1
+    child = MCTSNode(next_state, player, parent=self, parent_action=action)
+    self.children.append(child)
+    return child    
 
   def rollout(self):
-    current_rollout_state = self.state
-    
-    while not current_rollout_state.is_game_over():
-        
-      possible_moves = current_rollout_state.get_legal_actions()
-        
-      action = self.rollout_policy(possible_moves)
-      current_rollout_state = current_rollout_state.move(action)
-    return current_rollout_state.game_result()
+    while not self.state.is_game_over():  
+      possible_moves = self.state.get_legal_actions()
+      action = self.choose_move(possible_moves)
+      self.state = self.state.move_MTCS(self.player_number, action)
+    return self.state.game_result(self.player_number)
 
   def backpropagate(self, result):
-    self._number_of_visits += 1.
-    self._results[result] += 1.
+    self.num_sims += 1.
+    if result == 1:
+      self.wins += 1
+    elif result == -1:
+      self.losses += 1
     if self.parent:
       self.parent.backpropagate(result)
 
-  def is_fully_expanded(self):
-    return len(self._untried_actions) == 0
+  def UCT(self, N, c, good):
+    UCT = good * (self.wins-self.losses/self.num_sims) + c * np.sqrt((2 * np.log(N) / self.num_sims))
+    return UCT
 
+  def best_child(self, c=0.5):
+    good = 1 if self.player_number == self.want_to_win else -1
+    # multiply weights by -1 if it isn't the player we want to win 
+    weights = [child.UCT(self.num_sims, c, good) for child in self.children]
+    # still can't figure out why self.children is empty sometimes
+    return self.children[np.argmax(weights)]
 
-  def best_child(self, c_param=0.5):
-    
-    choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children]
-    # can't figure out why self.children is empty sometimes
-    return self.children[np.argmax(choices_weights)]
-
-  def rollout_policy(self, possible_moves):
-    
+  def choose_move(self, possible_moves):
+    # currently random
     return possible_moves[np.random.randint(len(possible_moves))]
-
-  def tree_policy(self):
-
-    current_node = self
-    while not current_node.is_terminal_node():
-        
-      if not current_node.is_fully_expanded():
-        return current_node.expand()
+  
+  def simulate(self):
+    curr_node = self
+    while not curr_node.state.is_game_over():
+      if not len(self.actions) == 0:
+        return curr_node.expand()
       else:
-        current_node = current_node.best_child()
-    return current_node
+        curr_node = curr_node.best_child()
+    return curr_node
 
   def best_action(self):
-    simulation_no = 100
-    for i in range(simulation_no):
-    
-      v = self.tree_policy()
+    simulations = 100
+    for i in range(simulations):
+      v = self.simulate()
       reward = v.rollout()
       v.backpropagate(reward)
-
-    return self.best_child(c_param=0.5)
-
-def main():
-  initial_state = create_board()
-  root = MCTSNode(state = initial_state)
-  result = root.best_action()
-  # visualize_board(result.state)
-  # print("board_status: ", result.state.board_status)
-  # print("won: ", result.state.won)
-  # print("parent_action: ", result.parent_action)
-  # print("untried_actions: ", result._untried_actions)
-  return result
-
-if __name__ == "__main__":
-  main()
+    return self.best_child(c=0.).parent_action

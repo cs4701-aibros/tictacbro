@@ -16,11 +16,12 @@ def make_random_move(player_number, game_board):
     action = actions_list[index]
     game_board.make_move(player_number, action)
 
-def make_monte_carlo_move(game_board):
+def monte_carlo_move(game_board):
+    # copy game board so MC can do it's game tree search on it without affecting actual board
     game_board2 = copy.deepcopy(game_board)
-    root = MCTSNode(state = game_board2)
-    mcts_move = root.best_action().parent_action
-    game_board.move(mcts_move)
+    root = MCTSNode(state = game_board2, player_number=2)
+    mcts_move = root.best_action()
+    return mcts_move
 
 """
 Simulates num_games games of p1 vs. p2 and outputs win/draw percentages.
@@ -33,7 +34,8 @@ def simulate(num_games, p1_type, p2_type):
     error_count = 0
     draw_count = 0
 
-    # need try except block because some runs of montecarlo give a random value error
+    # need try except block because some runs of montecarlo give a value error
+    # due to self.children being empty in the one case I can't figure out
     # other than that, (in the games where montecarlo works) it wins about 96% 
     # and ties 4% of the time
     i = 0
@@ -46,13 +48,14 @@ def simulate(num_games, p1_type, p2_type):
                 if p1_type == "Random":
                     make_random_move(player_number = 1, game_board = game_board)
                 else:
-                    make_monte_carlo_move(game_board)
-
+                    action = monte_carlo_move(game_board)
+                    game_board.make_move(1, action)
                 #p2 move
                 if p2_type == "Random":
                     make_random_move(player_number = 2, game_board = game_board)
                 else:
-                    make_monte_carlo_move(game_board)
+                    action = monte_carlo_move(game_board)
+                    game_board.make_move(2, action)
                 
             if game_board.won == 2:
                 p2_win_count += 1
@@ -74,4 +77,4 @@ def simulate(num_games, p1_type, p2_type):
 
 
 if __name__ == "__main__":
-  simulate(num_games = 50, p1_type = "Random", p2_type="MCTS")
+    simulate(num_games = 50, p1_type = "MCTS", p2_type="MCTS")
