@@ -137,7 +137,7 @@ class BigBoard(Board):
         Ex. if board_status[0] = 1, then player 1 has won board 0
     prev_move : 3-int tuple of the form (big, small, player_number) with 
         big representing the subboard and small representing the spot on the 
-        subboard (-1, -1, 2) if there is no previous move (initial state and 
+        subboard (-1, -1, 1) if there is no previous move (initial state and 
         player 1 goes first)
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
@@ -163,7 +163,7 @@ class BigBoard(Board):
     def __init__(self, subboards):
         super(BigBoard, self).__init__()
         self.boards = subboards
-        self.prev_move = (-1, -1, 2)
+        self.prev_move = (-1, -1, 1)
 
     def make_move(self, player, move):
         big, small = move
@@ -231,32 +231,25 @@ class BigBoard(Board):
         """
         return self.check_won() or self.check_draw()
 
-    def game_result(self):
+    def game_result(self, player):
         """
         Returns 1 or 0 or -1 depending
-        on your state corresponding to win,
+        on state corresponding to win,
         tie or a loss.
         """
         if self.check_draw():
             return 0
         elif self.check_won():
             # if the winner is whoever went last
-            if self.won == self.prev_move[2]:
-                return -1
-            else:
+            if self.won == player:
                 return 1
+            else:
+                return -1
         return 0
-
-    def move(self,action):
-        """
-        Returns the new state after making a move.
-        """
-        prev_player = self.prev_move[2]
-        player = 0
-        if prev_player == 1:
-            player = 2
-        else:
-            player = 1    
-        self.make_move(player, action)
-        return self
   
+    def move_MTCS(self, player, move):
+        """
+        Returns new state after 'move' has been made by 'player'
+        """
+        self.make_move(player, move)
+        return self
