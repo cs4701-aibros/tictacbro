@@ -21,7 +21,6 @@ class MCTSNode():
     self._results = defaultdict(int)
     self._results[1] = 0
     self._results[-1] = 0
-    self._untried_actions = None
     self._untried_actions = self.untried_actions()
     return
 
@@ -74,6 +73,7 @@ class MCTSNode():
   def best_child(self, c_param=0.5):
     
     choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children]
+    # can't figure out why self.children is empty sometimes
     return self.children[np.argmax(choices_weights)]
 
   def rollout_policy(self, possible_moves):
@@ -100,61 +100,6 @@ class MCTSNode():
       v.backpropagate(reward)
 
     return self.best_child(c_param=0.5)
-
-  # def get_legal_actions(self): 
-  #   """
-  #   Constructs a list of all
-  #   possible actions from current state.
-  #   Returns a list of moves in the form (big, small).
-  #   """
-  #   curr_board = self.state.curr_board
-  #   _, big = curr_board.prev_move
-  #   if big != -1 and curr_board.boards[big].won == 0:
-  #     result = []
-  #     for i in range(9):
-  #       if curr_board.boards[big].board_status[i] == 0:
-  #         result.append((big, i))
-  #     return result
-  #   else: 
-  #     result = []
-  #     for i in range(9):
-  #       if curr_board.boards[i].won == 0:
-  #         for j in range(9):
-  #             if curr_board.boards[i].board_status[j] == 0:
-  #               result.append((i, j))
-  #     return result
-
-  # def is_game_over(self):
-  #   """
-  #   Returns true if the game is over, false otherwise.
-  #   """
-  #   curr_board = self.state.curr_board
-  #   return curr_board.check_won() or curr_board.check_draw()
-
-  # def game_result(self):
-  #   """
-  #   Returns 1 or 0 or -1 depending
-  #   on your state corresponding to win,
-  #   tie or a loss.
-  #   """
-  #   curr_board = self.state.curr_board
-  #   if curr_board.check_draw():
-  #     return 0
-  #   elif curr_board.check_won():
-  #     if curr_board.won == self.player_number:
-  #       return 1
-  #     else:
-  #       return -1
-  #   return 0
-
-  # def move(self,action):
-  #   """
-  #   Returns the new state after making a move.
-  #   """
-  #   curr_board = self.state.curr_board
-  #   curr_board.make_move(self.player_number, action)
-  #   return self.state.curr_board
-
 
 def main():
   initial_state = create_board()

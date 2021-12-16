@@ -240,6 +240,7 @@ class BigBoard(Board):
         if self.check_draw():
             return 0
         elif self.check_won():
+            # if the winner is whoever went last
             if self.won == self.prev_move[2]:
                 return -1
             else:
@@ -250,6 +251,12 @@ class BigBoard(Board):
         """
         Returns the new state after making a move.
         """
-        self.make_move(2, action)
+        prev_player = self.prev_move[2]
+        player = 0
+        if prev_player == 1:
+            player = 2
+        else:
+            player = 1    
+        self.make_move(player, action)
         return self
   
