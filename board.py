@@ -28,7 +28,7 @@ class Board(object):
                 6 | 7 | 8
     won : int
         an integer representing which player has won the board
-        (0 meaning still in progress, -1 meaning all squares are full with no 
+        (0 meaning still in progress, -1 meaning all squares are full with no
         winner (ie. a draw))
 
     Methods
@@ -38,7 +38,7 @@ class Board(object):
         is illegal will raise InvalidMove, but this can (and should) be avoided
         by checking if moves are legal to begin with.
         Returns the spot taken (which will be the next big board used in
-        ultimate tic-tac-toe), a bool which indicates whether the player 
+        ultimate tic-tac-toe), a bool which indicates whether the player
         has won the board, and a bool which indicates if the board is draw
     is_legal(move)
         Checks if the spot referenced by int move is available to be taken by a
@@ -112,7 +112,7 @@ class Board(object):
             self.won = diags
             return True
         return False
-    
+
     # Returns true iff the board is completely full and no player has won
     def check_draw(self):
         if not self.check_won():
@@ -135,13 +135,13 @@ class BigBoard(Board):
     board_status : int list
         a list of ints representing the won status of the subboards
         Ex. if board_status[0] = 1, then player 1 has won board 0
-    prev_move : 3-int tuple of the form (big, small, player_number) with 
-        big representing the subboard and small representing the spot on the 
-        subboard (-1, -1, 1) if there is no previous move (initial state and 
+    prev_move : 3-int tuple of the form (big, small, player_number) with
+        big representing the subboard and small representing the spot on the
+        subboard (-1, -1, 1) if there is no previous move (initial state and
         player 1 goes first)
     won : int
         an integer representing which player has won the ultimate tic-tac-toe
-        game (0 meaning still in progress, -1 meaning all squares are full with 
+        game (0 meaning still in progress, -1 meaning all squares are full with
         no winner (ie. a draw))
 
     Methods
@@ -168,7 +168,7 @@ class BigBoard(Board):
     def make_move(self, player, move):
         big, small = move
         if self.boards[big].won == 0:
-            (move, did_win, is_draw) = self.boards[big].make_move(player, small)
+            move, did_win, is_draw = self.boards[big].make_move(player, small)
             if did_win:
                 self.board_status[big] = player
             elif is_draw:
@@ -200,10 +200,9 @@ class BigBoard(Board):
     def check_draw(self):
         return super(BigBoard, self).check_draw()
 
+    # these are functions needed for MCTS
 
-# these are functions needed for MCTS
-
-    def get_legal_actions(self): 
+    def get_legal_actions(self):
         """
         Constructs a list of all
         possible actions from current state.
@@ -216,7 +215,7 @@ class BigBoard(Board):
                 if self.boards[big].board_status[i] == 0:
                     result.append((big, i))
             return result
-        else: 
+        else:
             result = []
             for i in range(9):
                 if self.boards[i].won == 0:
@@ -245,8 +244,8 @@ class BigBoard(Board):
                 return 1
             else:
                 return -1
-        return 0
-  
+        assert False
+
     def move_MTCS(self, player, move):
         """
         Returns new state after 'move' has been made by 'player'
