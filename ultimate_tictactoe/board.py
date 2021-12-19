@@ -145,6 +145,7 @@ class BigBoard(Board):
         super(BigBoard, self).__init__()
         self.boards = [Board() for i in range(9)]
         self.next_board = -1
+        self.prev_move = (-1, -1, 1)
 
     def play_turn(self, agent, move):
         big, small = move
@@ -155,6 +156,7 @@ class BigBoard(Board):
             move, finished = self.boards[subboard].make_move(agent, small)
             if finished:
                 self.board_status[subboard] = self.boards[subboard].won
+            self.prev_move = (big, small, agent)
             if self.boards[move].won == 0:
                 self.next_board = move
                 return
@@ -235,7 +237,7 @@ class BigBoard(Board):
         """
         Returns new state after 'move' has been made by 'player'
         """
-        self.make_move(player, move)
+        self.play_turn(player, move)
         return self
 
     def __str__(self):

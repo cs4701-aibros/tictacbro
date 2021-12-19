@@ -76,7 +76,7 @@ class MCTSNode:
         return curr_node
 
     def best_action(self):
-        simulations = 5000
+        simulations = 10
         for i in range(simulations):
             v = self.simulate()
             reward = v.rollout()
