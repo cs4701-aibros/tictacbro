@@ -83,4 +83,4 @@ def simulate(num_games, p1_type, p2_type):
 
 
 if __name__ == "__main__":
-    simulate(num_games=1000, p1_type="MCTS", p2_type="Random")
+    simulate(num_games=100, p1_type="MCTS", p2_type="Random")

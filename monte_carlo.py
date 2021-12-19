@@ -10,7 +10,6 @@ class MCTSNode:
 
     def __init__(self, state, player_number, origin, parent=None, parent_action=None):
         self.state = state
-        # Expects to be updated when first created
         self.want_to_win = origin
         self.player_number = player_number
         self.parent = parent
@@ -77,8 +76,7 @@ class MCTSNode:
         return curr_node
 
     def best_action(self):
-        assert self.want_to_win != 0
-        simulations = 100
+        simulations = 5000
         for i in range(simulations):
             v = self.simulate()
             reward = v.rollout()
