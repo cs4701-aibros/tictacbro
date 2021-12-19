@@ -40,7 +40,6 @@ Makes a given move, tuple of the form (board, space), on board curr_board as pla
 def take_turn(curr_board, player, move):
     if curr_board.is_legal(move):
         next_mov = curr_board.make_move(player, move)
-        print("board_status",curr_board.board_status)
         if curr_board.check_won():
             # Game ends
             return (True, None)
@@ -90,9 +89,9 @@ def sample_game(p2_type=""):
     while t_board.won == 0:
         # Interface stuff starts here
         # (in other words, for a nicer look we would change this)
-        visualize_board(t_board)
         # now makes you choose a new board if the other board is won or a draw
         if turn == 1 or p2_type not in ["random", "mcts", "minimax", "neural"]:
+            visualize_board(t_board)
             if subboard == -1 or t_board.boards[subboard].won != 0:
                 choosing_board = True
                 subboard = input(
